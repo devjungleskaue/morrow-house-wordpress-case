@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${WORDPRESS_DB_NAME}
+      MARIADB_USER: ${WORDPRESS_DB_USER}
+      MARIADB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${WORDPRESS_DB_ROOT_PASSWORD}
+    volumes: [db_data:/var/lib/mysql]
+  wordpress:
+    image: wordpress:7.0.2-php8.3-apache
+    depends_on: [db]
+    ports: ["${WORDPRESS_PORT}:80"]
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./wp-content/themes/morrow-house:/var/www/html/wp-content/themes/morrow-house
+      - ./wp-content/plugins/morrow-house-core:/var/www/html/wp-content/plugins/morrow-house-core
+  cli:
+    image: wordpress:cli-php8.3
+    depends_on: [wordpress]
+    user: "33:33"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./wp-content/themes/morrow-house:/var/www/html/wp-content/themes/morrow-house
+      - ./wp-content/plugins/morrow-house-core:/var/www/html/wp-content/plugins/morrow-house-core
+      - ./scripts:/project/scripts:ro
+      - ./tests:/project/tests:ro
+volumes:
+  db_data:
+  wordpress_data:

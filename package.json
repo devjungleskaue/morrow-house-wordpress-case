@@ -1,0 +1,9 @@
+{
+  "name": "morrow-house-wordpress-case",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/repository-contract.test.mjs"
+  },
+  "engines": { "node": ">=22.13.0" }
+}

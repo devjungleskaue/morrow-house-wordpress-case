@@ -1,0 +1,11 @@
+/.worktrees/
+.env
+.DS_Store
+node_modules/
+wordpress/
+mysql-data/
+uploads/
+*.log
+*.sql
+*.zip
+!release/.gitkeep
