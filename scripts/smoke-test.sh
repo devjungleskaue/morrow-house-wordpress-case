@@ -151,16 +151,45 @@ if (!html.includes("mh-checkout-disclosure") || !html.includes("Payment methods 
 #
 # It used to run on /shop/ alone, which is how the 404 page shipped with no
 # heading at all. The pages below cover the shopping path plus the two states a
-# visitor reaches by accident, and the exit code is checked per page so the
-# failure message says which one broke.
-for mh_path in "/shop/" "/product/vale-fluted-vase/" "/cart/" "/checkout/" "/about/" "/contact/" "/" "/no-such-page/" "/?s=zzzznothing&post_type=product"; do
-printf 'Accessibility contract: %s\n' "$mh_path"
+# visitor reaches by accident.
+#
+# Each entry carries the status it must answer with, and that is not
+# bookkeeping. The loop cannot use --fail, because one of the pages under test
+# is the 404, and once 404.php gained a heading and the site's landmarks the
+# markup checks alone could no longer tell "the page I asked for rendered" from
+# "the error page rendered". Delete a product and /product/vale-fluted-vase/
+# would answer 404 with one h1 and every landmark in place, and the contract
+# would have called that a pass. Asserting the status closes that.
+for mh_case in \
+  "/shop/ 200" \
+  "/product/vale-fluted-vase/ 200" \
+  "/cart/ 200" \
+  "/checkout/ 200" \
+  "/about/ 200" \
+  "/contact/ 200" \
+  "/ 200" \
+  "/no-such-page/ 404" \
+  "/?s=zzzznothing&post_type=product 200"; do
+mh_path="${mh_case% *}"
+mh_expected="${mh_case##* }"
+printf 'Accessibility contract: %s (expects %s)\n' "$mh_path" "$mh_expected"
 # The leading slash is stripped out of MH_PATH and put back in the message
 # below: Git Bash on Windows rewrites an environment value that starts with a
 # slash into a Windows path, which turned the failure message into nonsense.
-curl --location --silent --show-error --max-time 20 "$local_url$mh_path" | MH_PATH="${mh_path#/}" node -e '
-const html = require("node:fs").readFileSync(0, "utf8");
+curl --location --silent --show-error --max-time 20 \
+  --write-out '\nMH_STATUS:%{http_code}' "$local_url$mh_path" \
+  | MH_PATH="${mh_path#/}" MH_EXPECTED="$mh_expected" node -e '
+const bruto = require("node:fs").readFileSync(0, "utf8");
 const falhas = [];
+
+// curl appends the status it finished on, after any redirect it followed.
+const marcador = bruto.lastIndexOf("\nMH_STATUS:");
+const status = marcador === -1 ? "" : bruto.slice(marcador + 11).trim();
+const html = marcador === -1 ? bruto : bruto.slice(0, marcador);
+
+if (status !== process.env.MH_EXPECTED) {
+  falhas.push("answered " + (status || "nothing") + ", expected " + process.env.MH_EXPECTED);
+}
 
 if (!/<h1[\s>]/i.test(html)) falhas.push("no <h1>");
 if ((html.match(/<h1[\s>]/gi) ?? []).length > 1) falhas.push("more than one <h1>");
