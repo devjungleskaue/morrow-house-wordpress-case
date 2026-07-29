@@ -359,6 +359,82 @@ test("keeps the minified stylesheet in sync with its source", async () => {
   assert.equal(build.trim(), esperado, "store.css is stale; run npm run build:css");
 });
 
+test("keeps theme.json in sync with the stylesheet's tokens", async () => {
+  // theme.json and the stylesheet used to declare the design system twice and
+  // had already drifted: --muted and --clay-ink existed only in the CSS, so the
+  // editor could not offer them, and theme.json claimed a 760px content width
+  // against the stylesheet's 1180px. The editor and the front end therefore
+  // disagreed about layout in a build whose selling point is that the owner can
+  // edit it. Both files now come out of the same :root block.
+  const fonte = await read("wp-content/themes/morrow-house/assets/css/store.src.css");
+  const tema = JSON.parse(await read("wp-content/themes/morrow-house/theme.json"));
+
+  const root = fonte.match(/:root\s*\{([\s\S]*?)\n\}/);
+  assert.ok(root, ":root block must exist for the build to read tokens from");
+
+  const tokens = new Map();
+  for (const linha of root[1].replace(/\/\*[\s\S]*?\*\//g, "").split(/;|\n/)) {
+    const decl = linha.trim();
+    if (!decl.startsWith("--")) continue;
+    const at = decl.indexOf(":");
+    tokens.set(decl.slice(2, at).trim(), decl.slice(at + 1).trim());
+  }
+
+  // Every colour in the stylesheet reaches the editor, and every colour the
+  // editor offers exists in the stylesheet.
+  const noCss = [...tokens].filter(([, v]) => /^#[0-9a-f]{3,8}$/i.test(v)).map(([slug]) => slug).sort();
+  const noTema = tema.settings.color.palette.map((c) => c.slug).sort();
+  assert.deepEqual(noTema, noCss, "theme.json palette and the :root colours must match exactly");
+
+  for (const cor of tema.settings.color.palette) {
+    assert.equal(cor.color.toLowerCase(), tokens.get(cor.slug), `theme.json ${cor.slug} does not match --${cor.slug}`);
+  }
+
+  assert.equal(tema.settings.layout.contentSize, tokens.get("measure"));
+  assert.equal(tema.settings.layout.wideSize, tokens.get("shell"));
+
+  const familias = Object.fromEntries(tema.settings.typography.fontFamilies.map((f) => [f.slug, f.fontFamily]));
+  assert.equal(familias.display, tokens.get("font-display"));
+  assert.equal(familias.body, tokens.get("font-body"));
+
+  const tamanhos = Object.fromEntries(tema.settings.typography.fontSizes.map((f) => [f.slug, f.size]));
+  for (const [slug, token] of [["small", "type-small"], ["sub", "type-sub"], ["section", "type-section"], ["title", "type-title"]]) {
+    assert.equal(tamanhos[slug], tokens.get(token), `theme.json ${slug} does not match --${token}`);
+  }
+});
+
+test("gives every h2 and h3 a size, and never underlines a button", async () => {
+  // Only h1 had a size, so h2 and h3 fell to the browser's defaults. Next to a
+  // 66px h1 the 24px h2 inverted the hierarchy on About and the home page,
+  // where the h2 is the line that carries the message. a.button meanwhile
+  // inherited the underline from the `a` rule and the home page CTA came out
+  // underlined inside its own dark box.
+  const css = await read("wp-content/themes/morrow-house/assets/css/store.src.css");
+
+  assert.match(css, /\nh2 \{\s*font-size:/);
+  assert.match(css, /\nh3 \{\s*font-size:/);
+  assert.match(css, /\.button[\s\S]{0,400}?text-decoration:none/);
+
+  // Every class this project writes into markup has styling. They shipped as
+  // hooks the theme ignored, which is why the eyebrow rendered as body copy,
+  // the hero had no vertical rhythm, and the product's Material and Care list
+  // fell back to the browser's indented default on the page that sells things.
+  // The plugin is read as well as the seed: .product-details came from the
+  // plugin, so a seed-only check missed it.
+  const escritos = await Promise.all([
+    read("scripts/seed.php"),
+    read("wp-content/plugins/morrow-house-core/includes/class-product-details.php"),
+    read("wp-content/plugins/morrow-house-core/includes/class-demo-mode.php"),
+  ]);
+
+  const classes = new Set(escritos.flatMap((f) => [...f.matchAll(/class="([a-z][a-z-]*)"/g)].map((m) => m[1])));
+  assert.ok(classes.size >= 5, `expected several authored classes, found ${classes.size}`);
+
+  for (const classe of classes) {
+    assert.match(css, new RegExp(`\\.${classe}[\\s,{:]`), `.${classe} is written by this project but has no styling`);
+  }
+});
+
 test("keeps demo mode on unless a deployment opts out", async () => {
   // The switch matters less than its direction. If someone flips the default
   // during a refactor, nothing fails visibly: the storefront simply starts

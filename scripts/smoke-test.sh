@@ -142,16 +142,28 @@ if (!html.includes("mh-checkout-disclosure") || !html.includes("Payment methods 
 '
 
 
-# Accessibility contract on the rendered shop page.
+# Accessibility contract, on every page a shopper can reach.
 #
 # Static checks against real markup, not a full audit: they catch the failures
 # that survive a refactor unnoticed, like a landmark disappearing when someone
 # rewrites the header, or the skip link losing the target it points at. A
 # browser-driven audit would catch more and needs a browser; this needs curl.
-shop_html="$(curl --fail --location --silent --show-error --max-time 20 "$local_url/shop/")"
-printf '%s' "$shop_html" | node -e '
+#
+# It used to run on /shop/ alone, which is how the 404 page shipped with no
+# heading at all. The pages below cover the shopping path plus the two states a
+# visitor reaches by accident, and the exit code is checked per page so the
+# failure message says which one broke.
+for mh_path in "/shop/" "/product/vale-fluted-vase/" "/cart/" "/checkout/" "/about/" "/contact/" "/" "/no-such-page/" "/?s=zzzznothing&post_type=product"; do
+printf 'Accessibility contract: %s\n' "$mh_path"
+# The leading slash is stripped out of MH_PATH and put back in the message
+# below: Git Bash on Windows rewrites an environment value that starts with a
+# slash into a Windows path, which turned the failure message into nonsense.
+curl --location --silent --show-error --max-time 20 "$local_url$mh_path" | MH_PATH="${mh_path#/}" node -e '
 const html = require("node:fs").readFileSync(0, "utf8");
 const falhas = [];
+
+if (!/<h1[\s>]/i.test(html)) falhas.push("no <h1>");
+if ((html.match(/<h1[\s>]/gi) ?? []).length > 1) falhas.push("more than one <h1>");
 
 if (!/<html[^>]+lang=/i.test(html)) falhas.push("<html> has no lang attribute");
 
@@ -177,7 +189,11 @@ else {
 const semAlt = (html.match(/<img\b(?![^>]*\balt=)[^>]*>/gi) ?? []).length;
 if (semAlt) falhas.push(semAlt + " <img> without alt");
 
-if (falhas.length) throw new Error("Accessibility contract failed:\n  - " + falhas.join("\n  - "));
+if (falhas.length) {
+  throw new Error("Accessibility contract failed on /" + process.env.MH_PATH + ":\n  - " + falhas.join("\n  - "));
+}
 '
+done
+
 compose run --rm cli wp eval-file /project/tests/runtime-menu-failure.php
 printf 'Runtime smoke passed at %s using project %s.\n' "$local_url" "$SMOKE_PROJECT"

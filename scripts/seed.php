@@ -133,6 +133,30 @@ function mh_attach_product_image(int $product_id, string $arquivo, string $alt):
     set_post_thumbnail($product_id, $attachment_id);
 }
 
+/**
+ * Product category, created on demand and returned as a term id.
+ *
+ * Without this every product sat in "Uncategorized", which showed on the
+ * product page and left the catalogue with no archives to browse. Three
+ * products do not need taxonomy to function; a storefront that demonstrates
+ * WooCommerce does.
+ */
+function mh_product_category(string $nome, string $slug): int {
+    $existing = get_term_by('slug', $slug, 'product_cat');
+
+    if ($existing instanceof WP_Term) {
+        return (int) $existing->term_id;
+    }
+
+    $criado = wp_insert_term($nome, 'product_cat', ['slug' => $slug]);
+
+    if (is_wp_error($criado)) {
+        throw new RuntimeException('Could not create category ' . $slug . ': ' . $criado->get_error_message());
+    }
+
+    return (int) $criado['term_id'];
+}
+
 function mh_upsert_product(array $data): int {
     $id = wc_get_product_id_by_sku($data['sku']);
     $product = $id ? wc_get_product($id) : new WC_Product_Simple();
@@ -151,6 +175,7 @@ function mh_upsert_product(array $data): int {
     $product->set_description($data['description']);
     $product->set_short_description($data['short']);
     $product->set_manage_stock(false);
+    $product->set_category_ids([mh_product_category($data['category'], $data['category_slug'])]);
     $saved = $product->save();
 
     update_post_meta($saved, '_mh_material', $data['material']);
@@ -236,6 +261,7 @@ function morrow_house_seed(): void {
             'short' => 'Sculptural enough to stand empty.',
             'material' => 'Glazed white earthenware',
             'care' => 'Wipe with a damp cloth; not for the dishwasher.',
+            'category' => 'Vases', 'category_slug' => 'vases',
             'image' => 'vale-fluted-vase.jpg',
             'alt' => 'Tall cream vase with vertical flutes that gather to a closed bud at the rim and flare into leaf shapes at the base.',
         ],
@@ -248,6 +274,7 @@ function morrow_house_seed(): void {
             'short' => 'A quiet landing place for daily objects.',
             'material' => 'Coiled paper under lacquer',
             'care' => 'Wipe clean; avoid standing water.',
+            'category' => 'Trays', 'category_slug' => 'trays',
             'image' => 'field-tray.jpg',
             'alt' => 'Shallow rectangular tray on four short feet, its ribbed grey-green surface catching the light along each coil.',
         ],
@@ -260,6 +287,7 @@ function morrow_house_seed(): void {
             'short' => 'Low profile, matte surface, useful proportions.',
             'material' => 'Stoneware with an ash glaze',
             'care' => 'Hand wash and dry completely.',
+            'category' => 'Vessels', 'category_slug' => 'vessels',
             'image' => 'low-vessel.jpg',
             'alt' => 'Round grey stoneware jar, wider than it is tall, with a short collar and a softly mottled ash-glazed surface.',
         ],

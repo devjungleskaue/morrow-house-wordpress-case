@@ -92,7 +92,7 @@ This repository publishes no accessibility score, search ranking, page-speed res
 
 ## Trade-offs
 
-Longer reasoning, including the parts I chose not to build, is in [docs/decisions.md](docs/decisions.md).
+Longer reasoning, including the parts I chose not to build, is in [docs/decisions.md](docs/decisions.md). The product photographs are CC0 objects from the Cleveland Museum of Art, listed with accession numbers in [docs/credits.md](docs/credits.md).
 
 The case has no product-image pipeline, payment integration, account flow, tax setup, shipping rules or persistent operational data. Playground needs network access to download the pinned WordPress.org artifacts and retrieve the `v1.0.1` release tag. Docker is the route for retained local changes.
 
