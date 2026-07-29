@@ -16,6 +16,14 @@ final class Morrow_House_Product_Details {
     }
 
     public static function save(int $product_id): void {
+        // WooCommerce ja checa nonce e permissao antes de disparar este hook.
+        // A checagem aqui e proposital mesmo assim: o hook e publico e outro
+        // plugin pode dispara-lo fora do fluxo do admin, onde nada garante que
+        // quem chamou pode editar este produto.
+        if (!current_user_can('edit_product', $product_id)) {
+            return;
+        }
+
         foreach (['_mh_material', '_mh_care'] as $key) {
             $value = isset($_POST[$key]) ? sanitize_textarea_field(wp_unslash($_POST[$key])) : '';
             update_post_meta($product_id, $key, $value);
@@ -34,8 +42,8 @@ final class Morrow_House_Product_Details {
 
         if ($material || $care) {
             echo '<dl class="product-details">'
-                . ($material ? '<dt>Material</dt><dd>' . esc_html($material) . '</dd>' : '')
-                . ($care ? '<dt>Care</dt><dd>' . esc_html($care) . '</dd>' : '')
+                . ($material ? '<dt>' . esc_html__('Material', 'morrow-house') . '</dt><dd>' . esc_html($material) . '</dd>' : '')
+                . ($care ? '<dt>' . esc_html__('Care', 'morrow-house') . '</dt><dd>' . esc_html($care) . '</dd>' : '')
                 . '</dl>';
         }
     }

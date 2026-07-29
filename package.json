@@ -3,7 +3,10 @@
   "version": "1.0.1",
   "private": true,
   "scripts": {
-    "test": "node --test tests/repository-contract.test.mjs"
+    "test": "node --test tests/repository-contract.test.mjs",
+    "build:css": "node scripts/build-css.mjs"
   },
-  "engines": { "node": ">=22.13.0" }
+  "engines": {
+    "node": ">=22.13.0"
+  }
 }

@@ -327,3 +327,19 @@ test("public copy documents the real disclosure, matrix, release gate, and licen
   assert.doesNotMatch(readme, /conversion lift|revenue generated|used in production|live commercial store/i);
   assert.doesNotMatch(readme, /details to follow|coming soon|will be documented|after a public snapshot is available/i);
 });
+
+test("keeps the minified stylesheet in sync with its source", async () => {
+  // The build is a plain text transform, so drift is easy and silent: someone
+  // edits the source, forgets `npm run build:css`, and ships the old CSS.
+  const fonte = await read("wp-content/themes/morrow-house/assets/css/store.src.css");
+  const build = await read("wp-content/themes/morrow-house/assets/css/store.css");
+
+  const esperado = fonte
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\s*([{}:;,>])\s*/g, "$1")
+    .replace(/;}/g, "}")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  assert.equal(build.trim(), esperado, "store.css is stale; run npm run build:css");
+});
