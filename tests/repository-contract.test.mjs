@@ -343,3 +343,15 @@ test("keeps the minified stylesheet in sync with its source", async () => {
 
   assert.equal(build.trim(), esperado, "store.css is stale; run npm run build:css");
 });
+
+test("keeps demo mode on unless a deployment opts out", async () => {
+  // The switch matters less than its direction. If someone flips the default
+  // during a refactor, nothing fails visibly: the storefront simply starts
+  // offering payment methods, and a concept build quietly becomes one that
+  // takes money.
+  const source = await read("wp-content/plugins/morrow-house-core/includes/class-demo-mode.php");
+
+  assert.match(source, /return true;/, "is_enabled must fall back to true");
+  assert.match(source, /if \(!self::is_enabled\(\)\) \{\s*return;/, "boot must bail when disabled");
+  assert.match(source, /woocommerce_available_payment_gateways/, "gateways must still be removed when enabled");
+});

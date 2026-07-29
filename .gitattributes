@@ -1,2 +1,7 @@
 * text=auto eol=lf
 *.ps1 text eol=crlf
+
+# store.css is built from store.src.css by `npm run build:css`. Marking it
+# generated keeps the minified blob out of GitHub's language stats and collapses
+# it in diffs, so reviews land on the source that was actually written.
+wp-content/themes/morrow-house/assets/css/store.css linguist-generated=true

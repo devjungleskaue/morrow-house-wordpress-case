@@ -2,6 +2,8 @@
 
 Morrow House is a conceptual reference build, not a client project. It demonstrates a reproducible WordPress, Elementor Free and WooCommerce delivery with no real payments or customer data.
 
+The shop, its products and the `.example` contact address are invented and match no existing business.
+
 ## What this proves
 
 The case covers a small home-goods catalogue, product details, search, cart, a Checkout Block and an editable campaign page. The exact tested stack is WordPress 7.0.2, PHP 8.3, WooCommerce 10.9.4, Elementor Free 4.2.1 and MariaDB 11.4.
@@ -89,6 +91,8 @@ The theme has a skip link, labelled primary navigation, a menu button with state
 This repository publishes no accessibility score, search ranking, page-speed result, commercial metric or conversion claim.
 
 ## Trade-offs
+
+Longer reasoning, including the parts I chose not to build, is in [docs/decisions.md](docs/decisions.md).
 
 The case has no product-image pipeline, payment integration, account flow, tax setup, shipping rules or persistent operational data. Playground needs network access to download the pinned WordPress.org artifacts and retrieve the `v1.0.1` release tag. Docker is the route for retained local changes.
 

@@ -141,5 +141,43 @@ if (!html.includes("mh-checkout-disclosure") || !html.includes("Payment methods 
 }
 '
 
+
+# Accessibility contract on the rendered shop page.
+#
+# Static checks against real markup, not a full audit: they catch the failures
+# that survive a refactor unnoticed, like a landmark disappearing when someone
+# rewrites the header, or the skip link losing the target it points at. A
+# browser-driven audit would catch more and needs a browser; this needs curl.
+shop_html="$(curl --fail --location --silent --show-error --max-time 20 "$local_url/shop/")"
+printf '%s' "$shop_html" | node -e '
+const html = require("node:fs").readFileSync(0, "utf8");
+const falhas = [];
+
+if (!/<html[^>]+lang=/i.test(html)) falhas.push("<html> has no lang attribute");
+
+const skip = html.match(/<a[^>]+class="skip-link"[^>]+href="#([^"]+)"/i);
+if (!skip) falhas.push("skip link is missing");
+else if (!new RegExp("id=\"" + skip[1] + "\"").test(html)) falhas.push("skip link target #" + skip[1] + " does not exist");
+
+for (const [nome, re] of [["main", /<main\b/i], ["header", /<header\b/i], ["nav", /<nav\b/i]]) {
+  if (!re.test(html)) falhas.push("no <" + nome + "> landmark");
+}
+
+if (!/<nav[^>]+aria-label=/i.test(html)) falhas.push("<nav> has no accessible name");
+
+const toggle = html.match(/<button[^>]*class="menu-toggle"[^>]*>/i);
+if (!toggle) falhas.push("menu toggle is missing");
+else {
+  if (!/aria-expanded=/.test(toggle[0])) falhas.push("menu toggle has no aria-expanded");
+  const controls = toggle[0].match(/aria-controls="([^"]+)"/);
+  if (!controls) falhas.push("menu toggle has no aria-controls");
+  else if (!new RegExp("id=\"" + controls[1] + "\"").test(html)) falhas.push("aria-controls target #" + controls[1] + " does not exist");
+}
+
+const semAlt = (html.match(/<img\b(?![^>]*\balt=)[^>]*>/gi) ?? []).length;
+if (semAlt) falhas.push(semAlt + " <img> without alt");
+
+if (falhas.length) throw new Error("Accessibility contract failed:\n  - " + falhas.join("\n  - "));
+'
 compose run --rm cli wp eval-file /project/tests/runtime-menu-failure.php
 printf 'Runtime smoke passed at %s using project %s.\n' "$local_url" "$SMOKE_PROJECT"
