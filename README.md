@@ -10,7 +10,7 @@ The companion plugin removes every available WooCommerce payment gateway. A norm
 
 ## Launch the temporary store
 
-[Launch Morrow House in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/devjungleskaue/morrow-house-wordpress-case/main/blueprint.json)
+[Launch Morrow House in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/devjungleskaue/morrow-house-wordpress-case/v1.0.1/blueprint.json)
 
 The Blueprint installs the exact WooCommerce and Elementor ZIPs from WordPress.org, then reads the theme, companion plugin and seed from the `v1.0.1` repository tag. A Playground session is temporary; its store data disappears when the browser session ends.
 

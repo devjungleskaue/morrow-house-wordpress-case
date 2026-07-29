@@ -314,7 +314,7 @@ test("public copy documents the real disclosure, matrix, release gate, and licen
   assert.match(readme, /Elementor Free 4\.2\.1/);
   assert.match(
     readme,
-    /https:\/\/playground\.wordpress\.net\/\?blueprint-url=https:\/\/raw\.githubusercontent\.com\/devjungleskaue\/morrow-house-wordpress-case\/main\/blueprint\.json/,
+    /https:\/\/playground\.wordpress\.net\/\?blueprint-url=https:\/\/raw\.githubusercontent\.com\/devjungleskaue\/morrow-house-wordpress-case\/v1\.0\.1\/blueprint\.json/,
   );
   assert.match(readme, /`v1\.0\.1` repository tag/i);
   assert.doesNotMatch(readme, /planned `v1\.0\.1`|has not been published/i);
