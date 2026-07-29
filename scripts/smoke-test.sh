@@ -117,7 +117,7 @@ if (!html.includes("Start with a clear surface and keep the objects you reach fo
 }
 '
 
-product_id="$(compose run --rm cli wp eval "echo wc_get_product_id_by_sku('MH-LAMP-VALE');")"
+product_id="$(compose run --rm cli wp eval "echo wc_get_product_id_by_sku('MH-VASE-VALE');")"
 nonce="$(compose run --rm cli wp eval "echo wp_create_nonce('wc_store_api');")"
 cookie_jar="$(mktemp)"
 cart_json="$(curl --fail --silent --show-error --max-time 20 \

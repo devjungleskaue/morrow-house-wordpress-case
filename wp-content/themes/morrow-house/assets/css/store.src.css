@@ -16,6 +16,12 @@
   --ink:#1d2420;
   --pine:#28483b;
   --clay:#b96f4a;
+  /* --clay is a surface and outline colour: it clears the 3:1 required of
+     non-text (3.49:1 on paper) and fails the 4.5:1 required of text (3.49:1
+     again, which is the point). --clay-ink is the same hue darkened until it
+     passes as text on both backgrounds the theme uses: 4.94:1 on paper,
+     5.46:1 on white. Use it whenever clay carries words. */
+  --clay-ink:#9d5733;
   --line:#d8d0c4;
   /* Darkened from #65706a, which measured about 4.5:1 on --paper and only
      just cleared AA. Footer text should not be the rule riding the line. */
@@ -45,8 +51,15 @@ select:focus-visible {
   outline:3px solid var(--clay);
   outline-offset:3px
 }
+/* top/left are load-bearing. Without them the fixed position falls back to the
+   element's static position, which anything rendered above it in the body
+   moves: the demo notice injected at wp_body_open pushed it down far enough
+   that translateY(-150%) no longer cleared the viewport and the link sat
+   visible on every page. */
 .skip-link {
   position:fixed;
+  top:0;
+  left:0;
   transform:translateY(-150%);
   z-index:50;
   background:var(--ink);
@@ -55,6 +68,16 @@ select:focus-visible {
 }
 .skip-link:focus {
   transform:none
+}
+/* Injected at wp_body_open, before the header, so it needs to read as a system
+   banner rather than a stray paragraph. */
+.demo-notice {
+  margin:0;
+  padding:.6rem clamp(1rem,4vw,4rem);
+  background:var(--ink);
+  color:var(--paper);
+  font-size:.82rem;
+  letter-spacing:.02em
 }
 .site-header {
   display:grid;
@@ -130,31 +153,31 @@ input[type=submit] {
 .woocommerce-loop-product__link {
   text-decoration:none
 }
-.woocommerce-loop-product__link::before {
-  content:"";
+/* Product photography. The catalogue is museum object photography, all of it
+   shot against a neutral graded ground, so the frames carry a matching wash
+   instead of the white a storefront would usually use: on --paper a white box
+   would read as a hole in the page. object-fit:contain keeps whole objects
+   whole, since these are single objects and cropping one is worse than
+   letterboxing it. */
+/* Product photography.
+ *
+ * The three files in scripts/assets are square, and the frames are square to
+ * match, so nothing is cropped and nothing is letterboxed. That is deliberate:
+ * the objects arrive in three different orientations, and squaring them during
+ * asset preparation rather than in CSS is what lets the grid stay even without
+ * object-fit having to throw away part of a photograph. object-fit:contain is
+ * kept as the fallback for any image that is not square, since for single
+ * objects on a plain ground a letterbox is a better failure than a crop. */
+.woocommerce-loop-product__link img,
+.woocommerce-product-gallery img {
   display:block;
-  aspect-ratio:4/5;
-  margin-bottom:1rem;
-  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.5),transparent 26%),linear-gradient(145deg,var(--clay),var(--pine));
-  border-radius:48% 48% 22% 22%/34% 34% 12% 12%
+  width:100%;
+  height:auto;
+  aspect-ratio:1;
+  object-fit:contain
 }
-.woocommerce-product-gallery {
-  min-height:28rem;
-  background:linear-gradient(145deg,#d0a78f,var(--pine));
-  display:grid;
-  place-items:center
-}
-.woocommerce-product-gallery::after {
-  content:"Morrow House";
-  color:white;
-  font:700 clamp(2rem,6vw,5rem) Georgia,serif
-}
-/* Suppresses WooCommerce placeholder art so the CSS shapes above stay the only
-   product imagery. IF YOU ADD REAL PRODUCT PHOTOS, delete this rule first:
-   otherwise uploads save fine, show in the admin, and stay invisible on the
-   storefront, which reads as a broken upload rather than a design choice. */
-.woocommerce img {
-  display:none!important
+.woocommerce-loop-product__link img {
+  margin-bottom:1rem
 }
 .single-product div.product {
   display:grid;
@@ -172,19 +195,6 @@ input[type=submit] {
   background:white;
   padding:1rem;
   list-style:none
-}
-.woocommerce-cart-form table,
-.shop_table {
-  width:100%;
-  border-collapse:collapse
-}
-.woocommerce-cart-form th,
-.woocommerce-cart-form td,
-.shop_table th,
-.shop_table td {
-  padding:1rem;
-  border-bottom:1px solid var(--line);
-  text-align:left
 }
 .site-footer {
   padding:2rem clamp(1rem,4vw,4rem);
@@ -212,7 +222,15 @@ input[type=submit] {
     display:block
   }
   .site-header ul {
-    flex-direction:column
+    flex-direction:column;
+    gap:0
+  }
+  /* The links were 21px tall with 28px of dead space between them. The gap
+     becomes the target instead of separating it, so the row a thumb can hit
+     matches the row it can see. Nothing moves visually. */
+  .site-header nav a {
+    display:block;
+    padding:.7rem 0
   }
   .products {
     grid-template-columns:1fr!important
@@ -289,64 +307,66 @@ input[type=submit] {
   text-decoration:none;
   font-weight:700
 }
-.woocommerce-cart-form,
-.cart-collaterals,
-.woocommerce-checkout {
-  margin-top:2rem
-}
-.cart-collaterals {
-  display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(18rem,.55fr);
-  gap:2rem
-}
-.cart_totals {
-  border:1px solid var(--line);
-  padding:1.25rem
-}
-.woocommerce-cart-form .product-remove a {
-  color:var(--clay);
+/* Cart and checkout are the WooCommerce BLOCKS, not the classic templates.
+ *
+ * The rules that used to live here styled .woocommerce-cart-form, .shop_table,
+ * .cart_totals, .woocommerce-billing-fields and #payment. None of those exist
+ * in this store, so none of it ever applied. One of them did worse than
+ * nothing: .woocommerce-checkout is also the class WordPress puts on <body> on
+ * the checkout page, so `display:grid; grid-template-columns:1fr 1fr` landed on
+ * the document instead of a form and split header, content and footer into two
+ * columns.
+ *
+ * The theme opts out of WooCommerce's classic stylesheet, but the block styles
+ * load through a separate path and are not opted out of, so these selectors are
+ * matching styles that already exist and mostly need the palette corrected.
+ * That is why !important appears here and not elsewhere. */
+.wc-block-components-button:not(.is-link) {
+  background:var(--ink)!important;
+  border-color:var(--ink)!important;
+  color:white!important;
+  border-radius:0!important;
   font-weight:700
 }
-.woocommerce-checkout {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:2rem
+.wc-block-components-button:not(.is-link):hover {
+  background:var(--pine)!important;
+  border-color:var(--pine)!important
 }
-.woocommerce-billing-fields,
-.woocommerce-shipping-fields,
-.woocommerce-checkout-review-order {
-  background:white;
-  border:1px solid var(--line);
-  padding:1.5rem
+.wc-block-components-title,
+.wp-block-woocommerce-cart h2,
+.wc-block-components-checkout-step__title {
+  font-family:Georgia,"Times New Roman",serif;
+  letter-spacing:0
 }
-.woocommerce-checkout .form-row {
-  margin:0 0 1rem
+.wc-block-components-text-input input,
+.wc-block-components-textarea,
+.wc-block-components-select__select {
+  border:1px solid var(--line)!important;
+  border-radius:0!important;
+  background:white!important;
+  color:var(--ink)!important
 }
-.woocommerce-checkout .form-row label {
-  display:block;
-  font-weight:700;
-  margin-bottom:.35rem
+.wc-block-components-totals-item__value,
+.wc-block-components-product-price {
+  color:var(--pine);
+  font-weight:700
 }
-.woocommerce-checkout-review-order-table {
-  width:100%;
-  border-collapse:collapse
+.wc-block-cart-item__remove-link,
+.wc-block-components-product-name {
+  color:var(--clay-ink)!important
 }
-.woocommerce-checkout-review-order-table th,
-.woocommerce-checkout-review-order-table td {
-  padding:.75rem 0;
-  border-bottom:1px solid var(--line);
-  text-align:left
+/* WooCommerce ships these at 24x24 and 30x25. Growing the hit area leaves the
+   glyphs where they are. */
+.wc-block-cart-item__remove-link {
+  min-width:44px;
+  min-height:44px
 }
-.woocommerce-checkout #payment {
-  background:var(--paper);
-  border:1px solid var(--line);
-  margin-top:1rem;
-  padding:1rem
+.wc-block-components-quantity-selector__button {
+  min-width:44px!important;
+  min-height:44px!important
 }
-.woocommerce-checkout #payment ul {
-  margin:0;
-  padding:0;
-  list-style:none
+.wc-block-components-quantity-selector__input {
+  min-height:44px!important
 }
 .woocommerce-notices-wrapper {
   margin-bottom:1.5rem
@@ -400,12 +420,6 @@ input[type=submit] {
   color:white
 }
 @media(max-width:760px) {
-  .cart-collaterals,.woocommerce-checkout {
-    grid-template-columns:1fr
-  }
-  .woocommerce-cart-form {
-    overflow-x:auto
-  }
   .woocommerce-message .button,.woocommerce-info .button {
     float:none;
     margin:.75rem 0 0

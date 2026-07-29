@@ -16,7 +16,7 @@ function mh_smoke_seed_state(): array {
         $pages[$slug] = $page instanceof WP_Post ? (int) $page->ID : 0;
     }
 
-    $product_skus = ['MH-LAMP-VALE', 'MH-TRAY-FIELD', 'MH-VESSEL-LOW'];
+    $product_skus = ['MH-VASE-VALE', 'MH-TRAY-FIELD', 'MH-VESSEL-LOW'];
     $products = [];
 
     foreach ($product_skus as $sku) {
@@ -122,7 +122,7 @@ if (null === WC()->cart) {
     WC()->initialize_cart();
 }
 WC()->cart->empty_cart();
-mh_smoke_assert(false !== WC()->cart->add_to_cart($second_state['products']['MH-LAMP-VALE']), 'smoke cart must accept the sample product.');
+mh_smoke_assert(false !== WC()->cart->add_to_cart($second_state['products']['MH-VASE-VALE']), 'smoke cart must accept the sample product.');
 $cart_fragments = apply_filters('woocommerce_add_to_cart_fragments', []);
 mh_smoke_assert(isset($cart_fragments['a.cart-link']), 'the authoritative cart-link fragment must be registered.');
 mh_smoke_assert(

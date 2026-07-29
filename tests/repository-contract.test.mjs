@@ -57,8 +57,23 @@ test("Checkout stays block-based with a supported disclosure and no payment gate
   assert.match(demo, /woocommerce_available_payment_gateways/);
   assert.doesNotMatch(demo, /woocommerce_order_button_text|woocommerce_checkout_before_customer_details/);
   assert.match(demo, /no real orders or payments/i);
-  assert.match(seed, /<!-- wp:woocommerce\/checkout \/-->/);
+  // The seed must not author the cart or checkout block itself. It used to
+  // write the void form, '<!-- wp:woocommerce/cart /-->', over the pages
+  // WooCommerce builds on install. A void block has no inner content and these
+  // blocks render their inner content, so both pages came up carrying nothing
+  // but their heading. Deferring to wc_get_page_id keeps WooCommerce's own
+  // template, which is the only copy that stays current across releases.
+  // Checked against the code with comments stripped, because the docblock
+  // explaining the bug quotes the very string being banned.
+  const seedCode = seed.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+  assert.doesNotMatch(seedCode, /wp:woocommerce\/(cart|checkout)\s*\/-->/);
+  assert.match(seed, /wc_get_page_id\(/);
+  assert.match(seed, /mh_woo_page\('cart'/);
+  assert.match(seed, /mh_woo_page\('checkout'/);
+  // The disclosure is prepended to WooCommerce's content, and the marker guard
+  // is what keeps a second seed run from stacking a second copy.
   assert.match(seed, /mh-checkout-disclosure/);
+  assert.match(seed, /str_contains\(\$atual,\s*\$marcador\)/);
   assert.match(seed, /Payment methods are intentionally unavailable/);
 });
 

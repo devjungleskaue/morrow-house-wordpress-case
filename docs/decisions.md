@@ -24,11 +24,15 @@ What this costs: every state WooCommerce styles for free has to be handled here,
 
 Block-based cart and checkout still load their own styles through a different path, which is why a few `!important` declarations remain. They are marked in the source.
 
-## Product imagery drawn in CSS
+## Product imagery from open museum collections
 
-There is no licensed photography for a fictional brand, and generating stock imagery for it would misrepresent what the build contains. The product shapes are CSS gradients, and `.woocommerce img` is suppressed so those shapes stay the only imagery.
+The catalogue shows three objects from the Cleveland Museum of Art's open access collection, all released CC0. Every file, its accession number and its source page are listed in [credits.md](credits.md).
 
-This is the surprise most likely to waste someone's afternoon, so the rule carries a comment: uploading a real product photo will save correctly, appear in the admin, and never render on the storefront until that rule is removed.
+This replaces an earlier approach that drew the product shapes with CSS gradients and suppressed `.woocommerce img` so those shapes stayed the only imagery. The reasoning had been that a fictional brand has no licensed photography and stock imagery would misrepresent the build. What that argument missed is how the result reads on screen: three identical brown gradient blobs do not say "no photography here by choice", they say "the images failed to load". A storefront whose whole subject is the shopping surface cannot afford a catalogue that looks broken.
+
+Museum object photography solves it without the problem the CSS shapes were avoiding. The licence is unambiguous, the provenance is recorded rather than vague, and the house style of these collections is a single object on a neutral graded ground, which is the same convention premium homeware retailers use.
+
+Two consequences worth stating. The product copy follows the photographs rather than the reverse: each listing's material and description describe the object actually pictured, and one product changed from a table lamp to a vase because no open collection holds a contemporary lamp that matches an editorial storefront. And the image frames carry a warm wash instead of white, because against the cream page a white box reads as a hole rather than a frame.
 
 ## Payments removed rather than stubbed
 

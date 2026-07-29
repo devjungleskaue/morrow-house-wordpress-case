@@ -20,7 +20,7 @@ The Blueprint defines `MORROW_HOUSE_IS_PLAYGROUND` before plugin activation. In 
 
 ## Business brief
 
-Morrow House is a fictional Toronto shop for small-batch lighting, vessels and trays. The seed creates three sample products and pages for Shop, Cart, Checkout, Campaign, About and Contact. Names, prices and the `.example` email address are demo content.
+Morrow House is a fictional Toronto shop for small-batch vases, vessels and trays. The seed creates three sample products and pages for Shop, Cart, Checkout, Campaign, About and Contact. Names, prices and the `.example` email address are demo content.
 
 The storefront keeps the product journey inspectable without pretending to take orders. No real customer, order or payment data belongs in either the local stack or a temporary Playground session.
 
