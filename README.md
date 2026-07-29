@@ -10,9 +10,11 @@ The companion plugin removes every available WooCommerce payment gateway. A norm
 
 ## Launch the temporary store
 
-The Blueprint is prepared for an immutable release. It installs the exact WooCommerce and Elementor ZIPs from WordPress.org, then reads the theme, companion plugin and seed from the planned `v1.0.0` repository tag.
+[Launch Morrow House in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/devjungleskaue/morrow-house-wordpress-case/main/blueprint.json)
 
-The planned `v1.0.0` tag has not been published, so this repository does not present the Playground route as a working demo. A moving `main` reference would not represent the reviewed build. Playground sessions are temporary and discard their data when the browser session ends.
+The Blueprint installs the exact WooCommerce and Elementor ZIPs from WordPress.org, then reads the theme, companion plugin and seed from the `v1.0.1` repository tag. A Playground session is temporary; its store data disappears when the browser session ends.
+
+The Blueprint defines `MORROW_HOUSE_IS_PLAYGROUND` before plugin activation. In Playground, that flag swaps one Elementor Library URL builder because WordPress's IDN encoder rejects the service's long temporary address. The Cloud Library module stays enabled. Docker keeps Elementor's default URL handling.
 
 ## Business brief
 
@@ -88,7 +90,7 @@ This repository publishes no accessibility score, search ranking, page-speed res
 
 ## Trade-offs
 
-The case has no product-image pipeline, payment integration, account flow, tax setup, shipping rules or persistent operational data. Playground needs network access to download the pinned WordPress.org artifacts and retrieve the unpublished release tag. Docker is the route for retained local changes.
+The case has no product-image pipeline, payment integration, account flow, tax setup, shipping rules or persistent operational data. Playground needs network access to download the pinned WordPress.org artifacts and retrieve the `v1.0.1` release tag. Docker is the route for retained local changes.
 
 The `wordpress:cli-php8.3` helper image follows a PHP-line tag rather than an exact WP-CLI release. WordPress application core remains pinned to 7.0.2 in the shared volume.
 

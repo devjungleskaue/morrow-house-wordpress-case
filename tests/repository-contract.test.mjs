@@ -98,6 +98,14 @@ test("blueprint pins supported releases and planned immutable repository tag", a
   assert.deepEqual(blueprint.features, { networking: true });
   assert.match(blueprint.meta.description, /data is discarded when the browser session ends/i);
   assert.doesNotMatch(JSON.stringify(blueprint), /password|api[_-]?key|secret/i);
+  assert.deepEqual(blueprint.steps[0], {
+    step: "defineWpConfigConsts",
+    consts: { MORROW_HOUSE_IS_PLAYGROUND: true },
+    method: "rewrite-wp-config",
+  });
+  assert.equal(blueprint.steps[1]?.step, "setSiteOptions");
+  const firstInstall = blueprint.steps.findIndex(({ step }) => step === "installPlugin" || step === "installTheme");
+  assert.ok(blueprint.steps.findIndex(({ step }) => step === "setSiteOptions") < firstInstall);
 
   const expectedPluginArtifacts = new Map([
     ["woocommerce", "https://downloads.wordpress.org/plugin/woocommerce.10.9.4.zip"],
@@ -115,6 +123,10 @@ test("blueprint pins supported releases and planned immutable repository tag", a
       ),
     );
   }
+  const pluginIndex = (targetFolderName) =>
+    blueprint.steps.findIndex(({ step, options }) => step === "installPlugin" && options?.targetFolderName === targetFolderName);
+  assert.ok(pluginIndex("woocommerce") < pluginIndex("morrow-house-core"));
+  assert.ok(pluginIndex("morrow-house-core") < pluginIndex("elementor"));
 
   const repositoryResources = [];
   for (const step of blueprint.steps) {
@@ -125,7 +137,7 @@ test("blueprint pins supported releases and planned immutable repository tag", a
   assert.equal(repositoryResources.length, 3);
   for (const resource of repositoryResources) {
     assert.equal(resource.url, "https://github.com/devjungleskaue/morrow-house-wordpress-case");
-    assert.equal(resource.ref, "v1.0.0");
+    assert.equal(resource.ref, "v1.0.1");
     assert.equal(resource.refType, "tag");
   }
 
@@ -144,6 +156,44 @@ test("blueprint pins supported releases and planned immutable repository tag", a
   });
   assert.match(runSeed.code, /^<\?php require_once '\/wordpress\/wp-load\.php'; require '\/tmp\/morrow-house-seed\/seed\.php';$/);
   assert.ok(blueprint.steps.indexOf(seedFiles) < blueprint.steps.indexOf(runSeed));
+});
+
+test("Playground replaces only Elementor's Library URL builder", async () => {
+  const [plugin, adapter] = await Promise.all([
+    read("wp-content/plugins/morrow-house-core/morrow-house-core.php"),
+    read("wp-content/plugins/morrow-house-core/includes/class-playground-elementor-library.php").catch(() => ""),
+  ]);
+  const playgroundBranch = plugin.match(
+    /if\s*\(\s*defined\(\s*'MORROW_HOUSE_IS_PLAYGROUND'\s*\).*?\n\}/s,
+  )?.[0] ?? "";
+
+  assert.match(playgroundBranch, /MORROW_HOUSE_IS_PLAYGROUND/);
+  assert.match(playgroundBranch, /elementor\/connect\/apps\/register/);
+  assert.match(playgroundBranch, /register_app\(\s*'library'/);
+  assert.match(playgroundBranch, /class-playground-elementor-library\.php/);
+  assert.match(plugin, /Version:\s*1\.0\.1/);
+  assert.match(adapter, /extends\s+\\Elementor\\Core\\Common\\Modules\\Connect\\Apps\\Library/);
+  assert.match(adapter, /public function get_admin_url\(\s*\$action,\s*\$params\s*=\s*\[\]\s*\)/);
+  assert.match(adapter, /'app'\s*=>\s*\$this->get_slug\(\)/);
+  assert.match(adapter, /'action'\s*=>\s*\$action/);
+  assert.match(adapter, /'nonce'\s*=>\s*wp_create_nonce\(\s*\$this->get_slug\(\)\s*\.\s*\$action\s*\)/);
+  assert.match(adapter, /get_admin_url\(\)/);
+  assert.match(adapter, /\\Elementor\\Core\\Common\\Modules\\Connect\\Admin::PAGE_ID/);
+  assert.doesNotMatch(adapter, /Str::encode_idn_url|Reflection/);
+  assert.doesNotMatch(`${plugin}\n${adapter}`, /remove_(?:action|filter).*cloud|disable.*cloud-library/i);
+});
+
+test("release metadata stays aligned at 1.0.1", async () => {
+  const [manifest, lockfile, plugin] = await Promise.all([
+    read("package.json").then(JSON.parse),
+    read("package-lock.json").then(JSON.parse),
+    read("wp-content/plugins/morrow-house-core/morrow-house-core.php"),
+  ]);
+
+  assert.equal(manifest.version, "1.0.1");
+  assert.equal(lockfile.version, "1.0.1");
+  assert.equal(lockfile.packages[""].version, "1.0.1");
+  assert.match(plugin, /Version:\s*1\.0\.1/);
 });
 
 test("Compose pins WordPress and mounts only project code and smoke checks", async () => {
@@ -262,7 +312,15 @@ test("public copy documents the real disclosure, matrix, release gate, and licen
   assert.match(readme, /WordPress 7\.0\.2/);
   assert.match(readme, /WooCommerce 10\.9\.4/);
   assert.match(readme, /Elementor Free 4\.2\.1/);
-  assert.match(readme, /planned `v1\.0\.0` tag has not been published/i);
+  assert.match(
+    readme,
+    /https:\/\/playground\.wordpress\.net\/\?blueprint-url=https:\/\/raw\.githubusercontent\.com\/devjungleskaue\/morrow-house-wordpress-case\/main\/blueprint\.json/,
+  );
+  assert.match(readme, /`v1\.0\.1` repository tag/i);
+  assert.doesNotMatch(readme, /planned `v1\.0\.1`|has not been published/i);
+  assert.match(readme, /MORROW_HOUSE_IS_PLAYGROUND/);
+  assert.match(readme, /Cloud Library module stays enabled/i);
+  assert.match(readme, /Docker keeps Elementor's default URL handling/i);
   assert.match(readme, /GPL-2\.0-or-later/);
   assert.doesNotMatch(normalizedLicense, /\n\n$/);
   assert.doesNotMatch(readme, /names, prices, address/i);

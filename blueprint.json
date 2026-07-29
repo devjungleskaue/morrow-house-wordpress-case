@@ -10,12 +10,13 @@
   "preferredVersions": { "php": "8.3", "wp": "7.0.2" },
   "features": { "networking": true },
   "steps": [
-    { "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/woocommerce.10.9.4.zip" }, "options": { "activate": true, "targetFolderName": "woocommerce" } },
-    { "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/elementor.4.2.1.zip" }, "options": { "activate": true, "targetFolderName": "elementor" } },
-    { "step": "installPlugin", "pluginData": { "resource": "git:directory", "url": "https://github.com/devjungleskaue/morrow-house-wordpress-case", "ref": "v1.0.0", "refType": "tag", "path": "wp-content/plugins/morrow-house-core" }, "options": { "activate": true, "targetFolderName": "morrow-house-core" } },
-    { "step": "installTheme", "themeData": { "resource": "git:directory", "url": "https://github.com/devjungleskaue/morrow-house-wordpress-case", "ref": "v1.0.0", "refType": "tag", "path": "wp-content/themes/morrow-house" }, "options": { "activate": true, "targetFolderName": "morrow-house" } },
+    { "step": "defineWpConfigConsts", "consts": { "MORROW_HOUSE_IS_PLAYGROUND": true }, "method": "rewrite-wp-config" },
     { "step": "setSiteOptions", "options": { "blogname": "Morrow House", "blogdescription": "Objects for considered rooms", "permalink_structure": "/%postname%/", "woocommerce_currency": "CAD", "woocommerce_enable_guest_checkout": "yes" } },
-    { "step": "writeFiles", "writeToPath": "/tmp/morrow-house-seed", "filesTree": { "resource": "git:directory", "url": "https://github.com/devjungleskaue/morrow-house-wordpress-case", "ref": "v1.0.0", "refType": "tag", "path": "scripts" } },
+    { "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/woocommerce.10.9.4.zip" }, "options": { "activate": true, "targetFolderName": "woocommerce" } },
+    { "step": "installPlugin", "pluginData": { "resource": "git:directory", "url": "https://github.com/devjungleskaue/morrow-house-wordpress-case", "ref": "v1.0.1", "refType": "tag", "path": "wp-content/plugins/morrow-house-core" }, "options": { "activate": true, "targetFolderName": "morrow-house-core" } },
+    { "step": "installPlugin", "pluginData": { "resource": "url", "url": "https://downloads.wordpress.org/plugin/elementor.4.2.1.zip" }, "options": { "activate": true, "targetFolderName": "elementor" } },
+    { "step": "installTheme", "themeData": { "resource": "git:directory", "url": "https://github.com/devjungleskaue/morrow-house-wordpress-case", "ref": "v1.0.1", "refType": "tag", "path": "wp-content/themes/morrow-house" }, "options": { "activate": true, "targetFolderName": "morrow-house" } },
+    { "step": "writeFiles", "writeToPath": "/tmp/morrow-house-seed", "filesTree": { "resource": "git:directory", "url": "https://github.com/devjungleskaue/morrow-house-wordpress-case", "ref": "v1.0.1", "refType": "tag", "path": "scripts" } },
     { "step": "runPHP", "code": "<?php require_once '/wordpress/wp-load.php'; require '/tmp/morrow-house-seed/seed.php';" }
   ]
 }
