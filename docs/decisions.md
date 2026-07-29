@@ -1,5 +1,7 @@
 # Decisions
 
+For the decisions that turned out to be wrong, see [postmortem.md](postmortem.md).
+
 The README covers what this build does. These are the choices behind it, including the ones I would expect to defend in an interview.
 
 ## Elementor Free instead of native blocks
@@ -64,10 +66,12 @@ That second part matters more than it looks. Most seed scripts are written for t
 
 **A block theme port.** Interesting, and a different project. Doing both halfway would demonstrate neither.
 
+**A product gallery.** A second view of each object needs a second photograph, and these collections hold one per accession. The alternative is manufacturing one by cropping or mirroring the first, and [credits.md](credits.md) says this repository does not fabricate its assets. `add_theme_support('wc-product-gallery-zoom')` stays declared because it costs nothing and becomes correct the day a real catalogue arrives.
+
 ## No published scores
 
 The README states that this repository publishes no accessibility score, page-speed result, or conversion claim, and that is a decision rather than an omission.
 
-A Lighthouse number from a seeded demo with three products and CSS-drawn imagery says nothing about how the same code behaves on a real catalogue with real photography, real plugins, and real traffic. Publishing it would invite a comparison that the number cannot support.
+A Lighthouse number from a seeded demo with three products says nothing about how the same code behaves on a real catalogue with hundreds of them, real plugins, and real traffic. Publishing it would invite a comparison that the number cannot support.
 
 What the repository does instead is assert the structural pieces accessibility depends on, in the smoke test against rendered markup: a lang attribute, a skip link whose target exists, landmarks, an accessible name on navigation, state attributes on the menu button that point at a real element, and no image without alt text. Those either hold or fail the build. They are narrower than an audit and they do not go stale.

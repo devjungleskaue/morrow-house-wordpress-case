@@ -308,6 +308,7 @@ test("public copy documents the real disclosure, matrix, release gate, and licen
   const headings = [...normalized.matchAll(/^(#{1,6})\s+(.+)$/gm)].map(([, hashes, title]) => `${hashes} ${title}`);
   assert.deepEqual(headings, [
     "# Morrow House — custom WooCommerce storefront",
+    "## Screens",
     "## What this proves",
     "## Launch the temporary store",
     "## Business brief",
@@ -339,6 +340,21 @@ test("public copy documents the real disclosure, matrix, release gate, and licen
   assert.match(readme, /GPL-2\.0-or-later/);
   assert.doesNotMatch(normalizedLicense, /\n\n$/);
   assert.doesNotMatch(readme, /names, prices, address/i);
+
+  // Every screenshot the README shows must exist and carry alt text. A README
+  // whose images 404 is worse than one with no images, and this repository
+  // fails its own build over an <img> without alt on the storefront, so it
+  // should hold its own front page to the same rule.
+  const telas = [
+    ...[...normalized.matchAll(/!\[([^\]]*)\]\((docs\/screenshots\/[^)]+)\)/g)].map(([, alt, caminho]) => ({ alt, caminho })),
+    ...[...normalized.matchAll(/<img\s+src="(docs\/screenshots\/[^"]+)"\s+alt="([^"]*)"/g)].map(([, caminho, alt]) => ({ alt, caminho })),
+  ];
+  assert.ok(telas.length >= 4, `the README should show the storefront, found ${telas.length} screenshots`);
+
+  for (const { alt, caminho } of telas) {
+    assert.ok(alt.trim().length > 10, `${caminho} needs descriptive alt text`);
+    await access(new URL(`../${caminho}`, import.meta.url));
+  }
   assert.doesNotMatch(readme, /conversion lift|revenue generated|used in production|live commercial store/i);
   assert.doesNotMatch(readme, /details to follow|coming soon|will be documented|after a public snapshot is available/i);
 });

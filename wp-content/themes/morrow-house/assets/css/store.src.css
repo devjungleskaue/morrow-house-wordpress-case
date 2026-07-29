@@ -493,6 +493,34 @@ input[type=submit] {
 .wc-block-components-product-name {
   color:var(--clay-ink)!important
 }
+/* The empty cart is a state every visitor reaches, and it renders a different
+   block again: the cross-sell grid uses .wp-block-button__link, which the rule
+   above does not match, so those buttons came out rounded while every other
+   button in the store is square. Its product links arrived underlined too. */
+.wp-block-button__link {
+  background:var(--ink)!important;
+  border-color:var(--ink)!important;
+  color:white!important;
+  border-radius:0!important;
+  font-weight:700
+}
+.wp-block-button__link:hover {
+  background:var(--pine)!important;
+  border-color:var(--pine)!important
+}
+.wc-block-grid__product-link,
+.wc-block-grid__product-title,
+.wc-block-components-product-name {
+  text-decoration:none
+}
+.wc-block-grid__product-title {
+  font-family:var(--font-display)!important;
+  font-size:var(--type-sub)!important;
+  line-height:1.2
+}
+.wc-block-grid__product-price {
+  font-size:1rem!important
+}
 /* WooCommerce ships these at 24x24 and 30x25. Growing the hit area leaves the
    glyphs where they are. */
 .wc-block-cart-item__remove-link {

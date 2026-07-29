@@ -2,7 +2,23 @@
 
 Morrow House is a conceptual reference build, not a client project. It demonstrates a reproducible WordPress, Elementor Free and WooCommerce delivery with no real payments or customer data.
 
+[![Validate WordPress case](https://github.com/devjungleskaue/morrow-house-wordpress-case/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/devjungleskaue/morrow-house-wordpress-case/actions/workflows/quality.yml)
+
 The shop, its products and the `.example` contact address are invented and match no existing business.
+
+## Screens
+
+| Shop | Product |
+|---|---|
+| ![Catalogue at 1280px, three products in a grid](docs/screenshots/shop.png) | ![Product page with breadcrumb, photograph, price and editable material and care fields](docs/screenshots/product.png) |
+
+| Checkout | Empty cart |
+|---|---|
+| ![Checkout Block with an order summary and a notice that no payment methods are available](docs/screenshots/checkout.png) | ![Empty cart state with a cross-sell grid](docs/screenshots/cart-empty.png) |
+
+The checkout capture is the one worth a second look: the red notice reading "There are no payment methods available" is the demo-mode safeguard doing its job, not a broken configuration.
+
+<img src="docs/screenshots/mobile.png" alt="Catalogue at 390px, one column, with the navigation collapsed behind a menu button" width="320">
 
 ## What this proves
 
@@ -20,7 +36,7 @@ The Blueprint defines `MORROW_HOUSE_IS_PLAYGROUND` before plugin activation. In 
 
 ## Business brief
 
-Morrow House is a fictional Toronto shop for small-batch vases, vessels and trays. The seed creates three sample products and pages for Shop, Cart, Checkout, Campaign, About and Contact. Names, prices and the `.example` email address are demo content.
+Morrow House is a fictional Toronto shop for small-batch vases, vessels and trays. The seed creates three sample products and the Shop, Campaign, About and Contact pages, and leaves the Cart and Checkout pages WooCommerce builds during install alone. Names, prices and the `.example` email address are demo content.
 
 The storefront keeps the product journey inspectable without pretending to take orders. No real customer, order or payment data belongs in either the local stack or a temporary Playground session.
 
@@ -82,7 +98,7 @@ docker compose --env-file .env.example config --quiet
 git diff --check
 ```
 
-GitHub Actions is configured to run the PowerShell reset contract on Windows and the fast tests, PHP lint, disposable integration smoke and disclosure scanner on Ubuntu. No remote result or badge is claimed here.
+GitHub Actions runs the PowerShell reset contract on Windows and the fast tests, PHP lint, disposable integration smoke and disclosure scanner on Ubuntu. The badge above links to the workflow rather than restating its result, so what you read is whatever the last run on `main` actually did.
 
 ## Accessibility, SEO and performance
 
@@ -92,9 +108,9 @@ This repository publishes no accessibility score, search ranking, page-speed res
 
 ## Trade-offs
 
-Longer reasoning, including the parts I chose not to build, is in [docs/decisions.md](docs/decisions.md). The product photographs are CC0 objects from the Cleveland Museum of Art, listed with accession numbers in [docs/credits.md](docs/credits.md).
+Longer reasoning, including the parts I chose not to build, is in [docs/decisions.md](docs/decisions.md). Four bugs this repository shipped, three of them the same root cause, are written up with measurements in [docs/postmortem.md](docs/postmortem.md). The product photographs are CC0 objects from the Cleveland Museum of Art, listed with accession numbers in [docs/credits.md](docs/credits.md).
 
-The case has no product-image pipeline, payment integration, account flow, tax setup, shipping rules or persistent operational data. Playground needs network access to download the pinned WordPress.org artifacts and retrieve the `v1.0.1` release tag. Docker is the route for retained local changes.
+The case has no payment integration, account flow, tax setup, shipping rules or persistent operational data. Playground needs network access to download the pinned WordPress.org artifacts and retrieve the `v1.0.1` release tag. Docker is the route for retained local changes.
 
 The `wordpress:cli-php8.3` helper image follows a PHP-line tag rather than an exact WP-CLI release. WordPress application core remains pinned to 7.0.2 in the shared volume.
 
