@@ -1,4 +1,4 @@
-# Morrow House — custom WooCommerce storefront
+# Morrow House: custom WooCommerce storefront
 
 Morrow House is a conceptual reference build, not a client project. It demonstrates a reproducible WordPress, Elementor Free and WooCommerce delivery with no real payments or customer data.
 
@@ -108,9 +108,7 @@ The theme has a skip link, labelled primary navigation, a menu button with state
 
 None of that is asserted in prose alone. The smoke runs an accessibility contract against the rendered markup of nine paths, covering the shopping route plus the two states a visitor reaches by accident, the 404 and an empty search. Each path is checked for a lang attribute, exactly one `h1`, a skip link whose target exists, `main`, `header` and `nav` landmarks, an accessible name on navigation, `aria-expanded` and `aria-controls` pointing at an element that exists, and no `<img>` without alt. Each path also declares the HTTP status it must answer with, because once the 404 page gained a heading and the site's landmarks the markup checks alone could no longer tell the page they asked for from the error page.
 
-This is narrower than an audit and it does not go stale. It is also not a score.
-
-This repository publishes no accessibility score, search ranking, page-speed result, commercial metric or conversion claim.
+This is narrower than an audit and it does not go stale. It is also not a measurement: this repository publishes no accessibility score, search ranking, page-speed result, commercial metric or conversion claim.
 
 ## Trade-offs
 

@@ -304,10 +304,10 @@ test("public copy documents the real disclosure, matrix, release gate, and licen
   const normalized = readme.replace(/\r\n/g, "\n");
   const normalizedLicense = license.replace(/\r\n/g, "\n");
   const opening = "Morrow House is a conceptual reference build, not a client project. It demonstrates a reproducible WordPress, Elementor Free and WooCommerce delivery with no real payments or customer data.";
-  assert.ok(normalized.startsWith(`# Morrow House — custom WooCommerce storefront\n\n${opening}\n`));
+  assert.ok(normalized.startsWith(`# Morrow House: custom WooCommerce storefront\n\n${opening}\n`));
   const headings = [...normalized.matchAll(/^(#{1,6})\s+(.+)$/gm)].map(([, hashes, title]) => `${hashes} ${title}`);
   assert.deepEqual(headings, [
-    "# Morrow House — custom WooCommerce storefront",
+    "# Morrow House: custom WooCommerce storefront",
     "## Screens",
     "## What this proves",
     "## Launch the temporary store",
@@ -321,7 +321,7 @@ test("public copy documents the real disclosure, matrix, release gate, and licen
     "## Disclosure",
     "## License",
   ]);
-  assert.match(readme, /^# Morrow House — custom WooCommerce storefront$/m);
+  assert.match(readme, /^# Morrow House: custom WooCommerce storefront$/m);
   assert.match(readme, /conceptual reference build/i);
   assert.match(readme, /no real payments/i);
   assert.match(readme, /checkout block/i);
