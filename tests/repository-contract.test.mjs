@@ -152,7 +152,7 @@ test("blueprint pins supported releases and planned immutable repository tag", a
   assert.equal(repositoryResources.length, 3);
   for (const resource of repositoryResources) {
     assert.equal(resource.url, "https://github.com/devjungleskaue/morrow-house-wordpress-case");
-    assert.equal(resource.ref, "v1.0.1");
+    assert.equal(resource.ref, "v1.1.0");
     assert.equal(resource.refType, "tag");
   }
 
@@ -186,7 +186,7 @@ test("Playground replaces only Elementor's Library URL builder", async () => {
   assert.match(playgroundBranch, /elementor\/connect\/apps\/register/);
   assert.match(playgroundBranch, /register_app\(\s*'library'/);
   assert.match(playgroundBranch, /class-playground-elementor-library\.php/);
-  assert.match(plugin, /Version:\s*1\.0\.1/);
+  assert.match(plugin, /Version:\s*1\.1\.0/);
   assert.match(adapter, /extends\s+\\Elementor\\Core\\Common\\Modules\\Connect\\Apps\\Library/);
   assert.match(adapter, /public function get_admin_url\(\s*\$action,\s*\$params\s*=\s*\[\]\s*\)/);
   assert.match(adapter, /'app'\s*=>\s*\$this->get_slug\(\)/);
@@ -198,17 +198,17 @@ test("Playground replaces only Elementor's Library URL builder", async () => {
   assert.doesNotMatch(`${plugin}\n${adapter}`, /remove_(?:action|filter).*cloud|disable.*cloud-library/i);
 });
 
-test("release metadata stays aligned at 1.0.1", async () => {
+test("release metadata stays aligned at 1.1.0", async () => {
   const [manifest, lockfile, plugin] = await Promise.all([
     read("package.json").then(JSON.parse),
     read("package-lock.json").then(JSON.parse),
     read("wp-content/plugins/morrow-house-core/morrow-house-core.php"),
   ]);
 
-  assert.equal(manifest.version, "1.0.1");
-  assert.equal(lockfile.version, "1.0.1");
-  assert.equal(lockfile.packages[""].version, "1.0.1");
-  assert.match(plugin, /Version:\s*1\.0\.1/);
+  assert.equal(manifest.version, "1.1.0");
+  assert.equal(lockfile.version, "1.1.0");
+  assert.equal(lockfile.packages[""].version, "1.1.0");
+  assert.match(plugin, /Version:\s*1\.1\.0/);
 });
 
 test("Compose pins WordPress and mounts only project code and smoke checks", async () => {
@@ -330,10 +330,10 @@ test("public copy documents the real disclosure, matrix, release gate, and licen
   assert.match(readme, /Elementor Free 4\.2\.1/);
   assert.match(
     readme,
-    /https:\/\/playground\.wordpress\.net\/\?blueprint-url=https:\/\/raw\.githubusercontent\.com\/devjungleskaue\/morrow-house-wordpress-case\/v1\.0\.1\/blueprint\.json/,
+    /https:\/\/playground\.wordpress\.net\/\?blueprint-url=https:\/\/raw\.githubusercontent\.com\/devjungleskaue\/morrow-house-wordpress-case\/v1\.1\.0\/blueprint\.json/,
   );
-  assert.match(readme, /`v1\.0\.1` repository tag/i);
-  assert.doesNotMatch(readme, /planned `v1\.0\.1`|has not been published/i);
+  assert.match(readme, /`v1\.1\.0` repository tag/i);
+  assert.doesNotMatch(readme, /planned `v1\.1\.0`|has not been published/i);
   assert.match(readme, /MORROW_HOUSE_IS_PLAYGROUND/);
   assert.match(readme, /Cloud Library module stays enabled/i);
   assert.match(readme, /Docker keeps Elementor's default URL handling/i);

@@ -1,6 +1,6 @@
 {
   "name": "morrow-house-wordpress-case",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "test": "node --test tests/repository-contract.test.mjs",

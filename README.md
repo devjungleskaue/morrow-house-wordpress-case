@@ -22,15 +22,15 @@ The checkout capture is the one worth a second look: the red notice reading "The
 
 ## What this proves
 
-The case covers a small home-goods catalogue, product details, search, cart, a Checkout Block and an editable campaign page. The exact tested stack is WordPress 7.0.2, PHP 8.3, WooCommerce 10.9.4, Elementor Free 4.2.1 and MariaDB 11.4.
+The case covers a small home-goods catalogue with categories and product search, product details, cart, a Checkout Block and an editable campaign page. The exact tested stack is WordPress 7.0.2, PHP 8.3, WooCommerce 10.9.4, Elementor Free 4.2.1 and MariaDB 11.4.
 
 The companion plugin removes every available WooCommerce payment gateway. A normal paragraph block above checkout states that payment methods are intentionally unavailable. Product material and care notes remain editable WooCommerce fields, and the Campaign heading, copy and link remain editable Elementor data.
 
 ## Launch the temporary store
 
-[Launch Morrow House in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/devjungleskaue/morrow-house-wordpress-case/v1.0.1/blueprint.json)
+[Launch Morrow House in WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/devjungleskaue/morrow-house-wordpress-case/v1.1.0/blueprint.json)
 
-The Blueprint installs the exact WooCommerce and Elementor ZIPs from WordPress.org, then reads the theme, companion plugin and seed from the `v1.0.1` repository tag. A Playground session is temporary; its store data disappears when the browser session ends.
+The Blueprint installs the exact WooCommerce and Elementor ZIPs from WordPress.org, then reads the theme, companion plugin and seed from the `v1.1.0` repository tag. A Playground session is temporary; its store data disappears when the browser session ends.
 
 The Blueprint defines `MORROW_HOUSE_IS_PLAYGROUND` before plugin activation. In Playground, that flag swaps one Elementor Library URL builder because WordPress's IDN encoder rejects the service's long temporary address. The Cloud Library module stays enabled. Docker keeps Elementor's default URL handling.
 
@@ -46,13 +46,15 @@ The storefront keeps the product journey inspectable without pretending to take 
 
 `wp-content/plugins/morrow-house-core` owns demo safeguards and product fields. It declares Cart and Checkout Block compatibility, removes payment gateways and renders the site-wide concept notice.
 
-`scripts/seed.php` upserts pages, products, navigation and the Elementor campaign. Menu API errors stop the seed with context. The primary location is assigned only after every menu item succeeds, and rewrite rules flush once per seed schema version. `blueprint.json` and `docker-compose.yml` provide the browser and retained local setup around the same project code.
+`scripts/seed.php` upserts pages, products, categories, navigation and the Elementor campaign, and sideloads the bundled product photographs with alt text. Menu API errors stop the seed with context. The primary location is assigned only after every menu item succeeds, and rewrite rules flush once per seed schema version. `blueprint.json` and `docker-compose.yml` provide the browser and retained local setup around the same project code.
 
 ## Hard parts
 
 Checkout remains a real WooCommerce Block flow without becoming a transaction surface. The integration smoke adds a priced product through the Store API, checks a cart count of one, confirms that `payment_methods` is empty and renders the disclosure above Checkout.
 
 Repeatability is tested instead of assumed. The smoke boots the pinned stack, runs the seed twice, compares database state, verifies the rendered Campaign has one `h1`, injects a real WordPress menu-creation failure and checks its own Docker cleanup.
+
+`theme.json` is generated rather than maintained. `npm run build:css` reads the `:root` block of `store.src.css` and writes both the minified stylesheet and the editor's palette, layout widths and type scale from it. The build fails if a colour reaches the stylesheet without reaching the editor, and fails if a width or type token it needs has gone missing. The two files had drifted before this existed: two colours lived only in the CSS, and they disagreed about content width by 420px, so the block editor and the front end were describing different layouts in a build whose whole argument is that the owner can edit it.
 
 Version references:
 
@@ -102,7 +104,11 @@ GitHub Actions runs the PowerShell reset contract on Windows and the fast tests,
 
 ## Accessibility, SEO and performance
 
-The theme has a skip link, labelled primary navigation, a menu button with state attributes and a live cart count. Campaign renders one main heading. WordPress supplies title tags, and theme assets remain local.
+The theme has a skip link, labelled primary navigation, a menu button with state attributes and a live cart count. WordPress supplies title tags, and theme assets remain local.
+
+None of that is asserted in prose alone. The smoke runs an accessibility contract against the rendered markup of nine paths, covering the shopping route plus the two states a visitor reaches by accident, the 404 and an empty search. Each path is checked for a lang attribute, exactly one `h1`, a skip link whose target exists, `main`, `header` and `nav` landmarks, an accessible name on navigation, `aria-expanded` and `aria-controls` pointing at an element that exists, and no `<img>` without alt. Each path also declares the HTTP status it must answer with, because once the 404 page gained a heading and the site's landmarks the markup checks alone could no longer tell the page they asked for from the error page.
+
+This is narrower than an audit and it does not go stale. It is also not a score.
 
 This repository publishes no accessibility score, search ranking, page-speed result, commercial metric or conversion claim.
 
@@ -110,7 +116,7 @@ This repository publishes no accessibility score, search ranking, page-speed res
 
 Longer reasoning, including the parts I chose not to build, is in [docs/decisions.md](docs/decisions.md). Four bugs this repository shipped, three of them the same root cause, are written up with measurements in [docs/postmortem.md](docs/postmortem.md). The product photographs are CC0 objects from the Cleveland Museum of Art, listed with accession numbers in [docs/credits.md](docs/credits.md).
 
-The case has no payment integration, account flow, tax setup, shipping rules or persistent operational data. Playground needs network access to download the pinned WordPress.org artifacts and retrieve the `v1.0.1` release tag. Docker is the route for retained local changes.
+The case has no payment integration, account flow, tax setup, shipping rules or persistent operational data. Playground needs network access to download the pinned WordPress.org artifacts and retrieve the `v1.1.0` release tag. Docker is the route for retained local changes.
 
 The `wordpress:cli-php8.3` helper image follows a PHP-line tag rather than an exact WP-CLI release. WordPress application core remains pinned to 7.0.2 in the shared volume.
 

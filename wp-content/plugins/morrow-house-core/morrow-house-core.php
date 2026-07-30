@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Morrow House Core
  * Description: Demo-mode safeguards and content model for the Morrow House conceptual storefront.
- * Version: 1.0.1
+ * Version: 1.1.0
  * Author: Kauê Natan Jungles
  * License: GPL-2.0-or-later
  * WC requires at least: 10.9
