@@ -225,4 +225,18 @@ if (falhas.length) {
 done
 
 compose run --rm cli wp eval-file /project/tests/runtime-menu-failure.php
+# Screenshots, while a verified storefront is still up and before the trap tears
+# it down. Set MORROW_HOUSE_CAPTURE to a directory to collect them; CI points it
+# at a path it uploads as a build artifact, so the captures committed in
+# docs/screenshots can always be compared against what the code renders today.
+# Optional and non-fatal on purpose: a missing browser should not fail a smoke
+# run that has already proved everything it set out to prove.
+if [[ -n "${MORROW_HOUSE_CAPTURE:-}" ]]; then
+  if bash scripts/capture-screens.sh "$local_url" "$MORROW_HOUSE_CAPTURE"; then
+    printf 'Captured the storefront into %s.\n' "$MORROW_HOUSE_CAPTURE"
+  else
+    printf 'Screen capture skipped or failed; the smoke result stands.\n' >&2
+  fi
+fi
+
 printf 'Runtime smoke passed at %s using project %s.\n' "$local_url" "$SMOKE_PROJECT"

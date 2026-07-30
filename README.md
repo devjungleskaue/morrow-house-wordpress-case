@@ -24,6 +24,13 @@ The checkout capture is the one worth a second look: the red notice reading "The
 
 The case covers a small home-goods catalogue with categories and product search, product details, cart, a Checkout Block and an editable campaign page. The exact tested stack is WordPress 7.0.2, PHP 8.3, WooCommerce 10.9.4, Elementor Free 4.2.1 and MariaDB 11.4.
 
+Version references:
+
+- WordPress releases: https://wordpress.org/download/releases/
+- WooCommerce: https://wordpress.org/plugins/woocommerce/
+- Elementor: https://wordpress.org/plugins/elementor/
+- Playground Blueprint format: https://wordpress.github.io/wordpress-playground/blueprints/data-format/
+
 The companion plugin removes every available WooCommerce payment gateway. A normal paragraph block above checkout states that payment methods are intentionally unavailable. Product material and care notes remain editable WooCommerce fields, and the Campaign heading, copy and link remain editable Elementor data.
 
 ## Launch the temporary store
@@ -55,13 +62,6 @@ Checkout remains a real WooCommerce Block flow without becoming a transaction su
 Repeatability is tested instead of assumed. The smoke boots the pinned stack, runs the seed twice, compares database state, verifies the rendered Campaign has one `h1`, injects a real WordPress menu-creation failure and checks its own Docker cleanup.
 
 `theme.json` is generated rather than maintained. `npm run build:css` reads the `:root` block of `store.src.css` and writes both the minified stylesheet and the editor's palette, layout widths and type scale from it. The build fails if a colour reaches the stylesheet without reaching the editor, and fails if a width or type token it needs has gone missing. The two files had drifted before this existed: two colours lived only in the CSS, and they disagreed about content width by 420px, so the block editor and the front end were describing different layouts in a build whose whole argument is that the owner can edit it.
-
-Version references:
-
-- WordPress releases: https://wordpress.org/download/releases/
-- WooCommerce: https://wordpress.org/plugins/woocommerce/
-- Elementor: https://wordpress.org/plugins/elementor/
-- Playground Blueprint format: https://wordpress.github.io/wordpress-playground/blueprints/data-format/
 
 ## Run locally
 
@@ -100,15 +100,35 @@ docker compose --env-file .env.example config --quiet
 git diff --check
 ```
 
+The screenshots above are captured from a running storefront, not drawn:
+
+```bash
+bash scripts/capture-screens.sh          # against a local stack on :8080
+```
+
+CI runs the same script against the disposable smoke stack and uploads the result as a build artifact, so what the code renders today is one download away from any run. There is deliberately no pixel diff gating the build: font rendering varies between runners, and a check that cries wolf is a check people learn to ignore.
+
 GitHub Actions runs the PowerShell reset contract on Windows and the fast tests, PHP lint, disposable integration smoke and disclosure scanner on Ubuntu. The badge above links to the workflow rather than restating its result, so what you read is whatever the last run on `main` actually did.
 
-## Accessibility, SEO and performance
+## Accessibility
 
 The theme has a skip link, labelled primary navigation, a menu button with state attributes and a live cart count. WordPress supplies title tags, and theme assets remain local.
 
 None of that is asserted in prose alone. The smoke runs an accessibility contract against the rendered markup of nine paths, covering the shopping route plus the two states a visitor reaches by accident, the 404 and an empty search. Each path is checked for a lang attribute, exactly one `h1`, a skip link whose target exists, `main`, `header` and `nav` landmarks, an accessible name on navigation, `aria-expanded` and `aria-controls` pointing at an element that exists, and no `<img>` without alt. Each path also declares the HTTP status it must answer with, because once the 404 page gained a heading and the site's landmarks the markup checks alone could no longer tell the page they asked for from the error page.
 
 This is narrower than an audit and it does not go stale. It is also not a measurement: this repository publishes no accessibility score, search ranking, page-speed result, commercial metric or conversion claim.
+
+## Translation
+
+The theme and the companion plugin each own a text domain and each ship a Brazilian Portuguese catalogue, so the pipeline is demonstrated rather than described. The storefront stays in English by default; switching the site language in Settings is enough to see the other one.
+
+```bash
+npm run build:i18n
+```
+
+That regenerates both templates from the source and compiles the catalogues, using the same pinned WP-CLI image as the rest of the tooling. The `.po` files are not generated: those are the translations themselves, edited by hand or in a tool like Poedit. A repository test walks the source and fails if a translatable string is missing from its template, because a template that has fallen behind is worse than none. Translators work from it, so a string it does not list is a string nobody can translate and nobody is told about.
+
+Two details that are easy to get wrong and fail silently. A theme catalogue is named for the locale alone, `pt_BR.mo`, while a plugin catalogue carries its domain first, `morrow-house-core-pt_BR.mo`; swap them and the file sits in the right folder while every string renders in English. And the plugin used to pass the theme's text domain to its own translation calls, which works only while this exact theme is active. The test asserts both.
 
 ## Trade-offs
 

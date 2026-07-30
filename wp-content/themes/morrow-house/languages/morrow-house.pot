@@ -1,0 +1,152 @@
+# Copyright (C) 2026 Kauê Natan Jungles
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Morrow House 1.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/morrow-house\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-30T17:07:06+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: morrow-house\n"
+
+#. Theme Name of the theme
+#: style.css
+msgid "Morrow House"
+msgstr ""
+
+#. Theme URI of the theme
+#: style.css
+msgid "https://github.com/devjungleskaue/morrow-house-wordpress-case"
+msgstr ""
+
+#. Description of the theme
+#: style.css
+msgid "Accessible WooCommerce reference storefront for a conceptual home-goods business."
+msgstr ""
+
+#. Author of the theme
+#: style.css
+msgid "Kauê Natan Jungles"
+msgstr ""
+
+#: 404.php:11
+msgid "404"
+msgstr ""
+
+#: 404.php:12
+msgid "That page is not here."
+msgstr ""
+
+#: 404.php:14
+msgid "The link may be old, or the page may have moved. The collection is the best place to pick things up again."
+msgstr ""
+
+#: 404.php:17
+msgid "Browse the collection"
+msgstr ""
+
+#: functions.php:11
+msgid "Primary navigation"
+msgstr ""
+
+#: functions.php:45
+msgid "Cart"
+msgstr ""
+
+#: header.php:10
+msgid "Skip to content"
+msgstr ""
+
+#: header.php:12
+msgid "Morrow House home"
+msgstr ""
+
+#: header.php:13
+msgid "Menu"
+msgstr ""
+
+#: header.php:14
+msgid "Primary"
+msgstr ""
+
+#: index.php:15
+msgid "Nothing found."
+msgstr ""
+
+#: searchform.php:16
+msgid "Search the collection"
+msgstr ""
+
+#: searchform.php:26
+msgid "Search"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Paper"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Ink"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Pine"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Clay"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Clay ink"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Line"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Muted"
+msgstr ""
+
+#: theme.json
+msgctxt "Font family name"
+msgid "Display"
+msgstr ""
+
+#: theme.json
+msgctxt "Font family name"
+msgid "Body"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Small"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Sub"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Section"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Title"
+msgstr ""

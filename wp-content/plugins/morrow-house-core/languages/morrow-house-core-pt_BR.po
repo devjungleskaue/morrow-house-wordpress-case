@@ -1,0 +1,33 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Morrow House Core\n"
+"Report-Msgid-Bugs-To: https://github.com/devjungleskaue/morrow-house-wordpress-case\n"
+"POT-Creation-Date: 2026-07-30 00:00+0000\n"
+"PO-Revision-Date: 2026-07-30 00:00+0000\n"
+"Last-Translator: Kauê Natan Jungles\n"
+"Language-Team: Português do Brasil\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Domain: morrow-house-core\n"
+
+#. Description of the plugin
+#: morrow-house-core.php
+msgid "Demo-mode safeguards and content model for the Morrow House conceptual storefront."
+msgstr "Salvaguardas de modo demonstração e modelo de conteúdo da vitrine conceitual Morrow House."
+
+#: includes/class-demo-mode.php:35
+msgid "Concept build — no real orders or payments are processed."
+msgstr "Build conceitual: nenhum pedido ou pagamento real é processado."
+
+#: includes/class-product-details.php:14
+#: includes/class-product-details.php:45
+msgid "Material"
+msgstr "Material"
+
+#: includes/class-product-details.php:15
+#: includes/class-product-details.php:46
+msgid "Care"
+msgstr "Cuidados"

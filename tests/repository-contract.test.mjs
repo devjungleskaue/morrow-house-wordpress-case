@@ -316,7 +316,8 @@ test("public copy documents the real disclosure, matrix, release gate, and licen
     "## Hard parts",
     "## Run locally",
     "## Validation",
-    "## Accessibility, SEO and performance",
+    "## Accessibility",
+    "## Translation",
     "## Trade-offs",
     "## Disclosure",
     "## License",
@@ -448,6 +449,66 @@ test("gives every h2 and h3 a size, and never underlines a button", async () => 
 
   for (const classe of classes) {
     assert.match(css, new RegExp(`\\.${classe}[\\s,{:]`), `.${classe} is written by this project but has no styling`);
+  }
+});
+
+test("keeps the translation catalogues in step with the source", async () => {
+  // A .pot that has fallen behind is worse than no .pot: translators work from
+  // it, so a string it is missing is a string nobody can translate and nobody
+  // is told about. This walks the source instead of trusting the file, the same
+  // way theme.json is generated rather than maintained.
+  //
+  // The theme and the plugin own separate domains. The plugin used to pass the
+  // theme's domain to every call, which only works while this exact theme is
+  // active.
+  const alvos = [
+    {
+      nome: "theme",
+      dominio: "morrow-house",
+      arquivos: [
+        "wp-content/themes/morrow-house/functions.php",
+        "wp-content/themes/morrow-house/header.php",
+        "wp-content/themes/morrow-house/index.php",
+        "wp-content/themes/morrow-house/searchform.php",
+        "wp-content/themes/morrow-house/404.php",
+      ],
+      pot: "wp-content/themes/morrow-house/languages/morrow-house.pot",
+      // Themes load {locale}.mo; plugins load {domain}-{locale}.mo. Getting
+      // that backwards is silent: the file is there and nothing translates.
+      catalogo: "wp-content/themes/morrow-house/languages/pt_BR",
+    },
+    {
+      nome: "plugin",
+      dominio: "morrow-house-core",
+      arquivos: [
+        "wp-content/plugins/morrow-house-core/includes/class-demo-mode.php",
+        "wp-content/plugins/morrow-house-core/includes/class-product-details.php",
+      ],
+      pot: "wp-content/plugins/morrow-house-core/languages/morrow-house-core.pot",
+      catalogo: "wp-content/plugins/morrow-house-core/languages/morrow-house-core-pt_BR",
+    },
+  ];
+
+  for (const alvo of alvos) {
+    const [pot, ...fontes] = await Promise.all([read(alvo.pot), ...alvo.arquivos.map(read)]);
+
+    await access(new URL(`../${alvo.catalogo}.po`, import.meta.url));
+    await access(new URL(`../${alvo.catalogo}.mo`, import.meta.url));
+
+    const traduziveis = new Set();
+    for (const fonte of fontes) {
+      for (const [, texto, dominio] of fonte.matchAll(
+        /(?:esc_html_e|esc_attr_e|esc_html__|esc_attr__|__|_e|_x)\(\s*'((?:[^'\\]|\\.)*)'\s*,\s*'([a-z-]+)'/g,
+      )) {
+        assert.equal(dominio, alvo.dominio, `${alvo.nome} string "${texto}" uses the wrong text domain`);
+        traduziveis.add(texto.replace(/\\'/g, "'"));
+      }
+    }
+
+    assert.ok(traduziveis.size > 0, `found no translatable strings in the ${alvo.nome}`);
+    for (const texto of traduziveis) {
+      assert.ok(pot.includes(`msgid "${texto.replace(/"/g, '\\"')}"`), `${alvo.pot} is missing "${texto}"; run npm run build:i18n`);
+    }
   }
 });
 

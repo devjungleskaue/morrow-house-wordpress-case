@@ -5,6 +5,8 @@
  * Version: 1.1.0
  * Author: Kauê Natan Jungles
  * License: GPL-2.0-or-later
+ * Text Domain: morrow-house-core
+ * Domain Path: /languages
  * WC requires at least: 10.9
  * WC tested up to: 10.9.4
  */
@@ -27,6 +29,18 @@ add_action('before_woocommerce_init', static function (): void {
     if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
     }
+});
+
+/**
+ * The plugin owns its text domain rather than borrowing the theme's.
+ *
+ * It used to pass 'morrow-house' to every translation call, which happens to be
+ * the theme's domain. That works only while this exact theme is active: swap the
+ * theme and the plugin's strings fall back to English with nothing to show for
+ * it. A plugin is a separate extension and loads its own catalogue.
+ */
+add_action('init', static function (): void {
+    load_plugin_textdomain('morrow-house-core', false, dirname(plugin_basename(__FILE__)) . '/languages');
 });
 
 add_action('plugins_loaded', static function (): void {

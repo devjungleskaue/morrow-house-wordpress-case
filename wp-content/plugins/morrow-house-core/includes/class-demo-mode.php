@@ -32,6 +32,6 @@ final class Morrow_House_Demo_Mode {
     }
 
     public static function notice(): void {
-        echo '<p class="demo-notice">' . esc_html__('Concept build — no real orders or payments are processed.', 'morrow-house') . '</p>';
+        echo '<p class="demo-notice">' . esc_html__('Concept build — no real orders or payments are processed.', 'morrow-house-core') . '</p>';
     }
 }

@@ -60,13 +60,21 @@ That second part matters more than it looks. Most seed scripts are written for t
 
 **Payment gateway integration.** Out of scope by design, and the reason is above.
 
-**Multi-language.** The theme is translation-ready with a text domain throughout, but no locale ships. Adding one would mean maintaining copy in two languages for a fictional shop, without demonstrating anything the text domain does not already show.
-
 **Product variations.** Three simple products exercise the catalogue, cart, and checkout path. Variations would add admin surface without changing what the case is about.
 
 **A block theme port.** Interesting, and a different project. Doing both halfway would demonstrate neither.
 
 **A product gallery.** A second view of each object needs a second photograph, and these collections hold one per accession. The alternative is manufacturing one by cropping or mirroring the first, and [credits.md](credits.md) says this repository does not fabricate its assets. `add_theme_support('wc-product-gallery-zoom')` stays declared because it costs nothing and becomes correct the day a real catalogue arrives.
+
+## Shipping a locale rather than only being translatable
+
+This used to sit under "what I did not build", on the argument that a text domain throughout already shows the work and that a second language for a fictional shop is copy nobody reads.
+
+The argument was wrong about what a locale demonstrates. It is not the copy. It is the pipeline: templates generated from source, catalogues compiled to the format WordPress loads, files named the way each extension type expects, and a check that stops a template from falling behind. None of that is visible in a codebase that merely calls `__()` correctly, and all of it is what an agency actually has to get right.
+
+Building it also surfaced a defect the "translation-ready" claim had been hiding. The companion plugin passed the theme's text domain to every one of its own translation calls. That works exactly as long as this theme is active; swap the theme and the plugin's strings fall back to English with nothing in the log to say why. The plugin now owns `morrow-house-core` and loads its own catalogue.
+
+The storefront still starts in English. Shipping pt_BR as the default would change what a reviewer sees for no reason, and the point is that switching the site language is enough.
 
 ## No published scores
 

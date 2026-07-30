@@ -11,8 +11,8 @@ final class Morrow_House_Product_Details {
     }
 
     public static function fields(): void {
-        woocommerce_wp_text_input(['id' => '_mh_material', 'label' => __('Material', 'morrow-house')]);
-        woocommerce_wp_textarea_input(['id' => '_mh_care', 'label' => __('Care', 'morrow-house')]);
+        woocommerce_wp_text_input(['id' => '_mh_material', 'label' => __('Material', 'morrow-house-core')]);
+        woocommerce_wp_textarea_input(['id' => '_mh_care', 'label' => __('Care', 'morrow-house-core')]);
     }
 
     public static function save(int $product_id): void {
@@ -42,8 +42,8 @@ final class Morrow_House_Product_Details {
 
         if ($material || $care) {
             echo '<dl class="product-details">'
-                . ($material ? '<dt>' . esc_html__('Material', 'morrow-house') . '</dt><dd>' . esc_html($material) . '</dd>' : '')
-                . ($care ? '<dt>' . esc_html__('Care', 'morrow-house') . '</dt><dd>' . esc_html($care) . '</dd>' : '')
+                . ($material ? '<dt>' . esc_html__('Material', 'morrow-house-core') . '</dt><dd>' . esc_html($material) . '</dd>' : '')
+                . ($care ? '<dt>' . esc_html__('Care', 'morrow-house-core') . '</dt><dd>' . esc_html($care) . '</dd>' : '')
                 . '</dl>';
         }
     }

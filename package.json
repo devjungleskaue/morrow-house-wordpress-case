@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "test": "node --test tests/repository-contract.test.mjs",
-    "build:css": "node scripts/build-css.mjs"
+    "build:css": "node scripts/build-css.mjs",
+    "build:i18n": "bash scripts/build-i18n.sh"
   },
   "engines": {
     "node": ">=22.13.0"

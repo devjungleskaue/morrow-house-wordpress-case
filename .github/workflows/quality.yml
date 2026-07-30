@@ -31,7 +31,22 @@ jobs:
       - name: Lint PHP
         run: find wp-content scripts -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Run disposable WordPress smoke
+        env:
+          # Captures the storefront while the verified stack is still up. The
+          # committed screenshots in docs/screenshots would otherwise go stale
+          # in silence; this makes what the code renders today downloadable from
+          # every run, without a pixel diff that fails builds over font
+          # rendering differences between runners.
+          MORROW_HOUSE_CAPTURE: ${{ runner.temp }}/screens
         run: bash scripts/smoke-test.sh
+      - name: Upload the storefront as it renders now
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storefront-screens
+          path: ${{ runner.temp }}/screens
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Validate disclosure-safe tracked files
         run: |
           ! git grep -nEi 'api[_-]?key|client[_-]?secret|BEGIN (RSA|OPENSSH) PRIVATE KEY' -- ':!.github/workflows/quality.yml'
